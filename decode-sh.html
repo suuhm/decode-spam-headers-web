@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--
+ 
+ **************************************************************************
+ Decode spam headers Web v0.2 (c) 2024 by suuhm
+
+ Web application for easy using the decode-spam-headers script by mgeeky
+
+ Credits:
+ --------
+
+ decode-spam-headers by mgeeky:
+ https://github.com/mgeeky/decode-spam-headers
+
+ ***************************************************************************
+
+-->
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Decoder</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Pastell Rot */
+        button.btn-primary:hover {
+            background-color: rgb(204, 72, 72);
+            border-color: rgb(166, 46, 46);
+            transition: background-color 0.3s ease;
+        }
+        /* Pastell Blau */
+        .pastel-blue {
+            background-color: #add8e6 !important;
+        }
+        /* Schöner grüner Hintergrund */
+        .success-bg {
+            background-color: rgb(103, 164, 71) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Header Decoder</h2>
+        <form id="headerForm">
+            <div class="form-group">
+                <label for="headerText">Header Text:</label>
+                <textarea class="form-control" id="headerText" name="headerText" rows="20"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="outputFile">Output File:</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="outputFile" name="outputFile" value="header_out.html">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-primary pastel-blue" onclick="browseFile()">Browse (.txt and .eml) File</button>
+                        <button type="button" class="btn btn-info pastel-blue" data-toggle="collapse" data-target="#advancedTests" aria-expanded="false" aria-controls="advancedTests">Advanced Tests</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapse mt-4" id="advancedTests">
+            <div class="card card-body">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test1" value="1">
+                    <label class="form-check-label" for="test1">1 - Received - Mail Servers Flow</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test2" value="2">
+                    <label class="form-check-label" for="test2">2 - Extracted IP addresses</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test3" value="3">
+                    <label class="form-check-label" for="test3">3 - Extracted Domains</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test4" value="4">
+                    <label class="form-check-label" for="test4">4 - Bad Keywords In Headers</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test5" value="5">
+                    <label class="form-check-label" for="test5">5 - Sender Address Analysis</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test6" value="6">
+                    <label class="form-check-label" for="test6">6 - Subject and Thread Topic Difference</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test7" value="7">
+                    <label class="form-check-label" for="test7">7 - Authentication-Results</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test8" value="8">
+                    <label class="form-check-label" for="test8">8 - ARC-Authentication-Results</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test9" value="9">
+                    <label class="form-check-label" for="test9">9 - Received-SPF</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test10" value="10">
+                    <label class="form-check-label" for="test10">10 - Mail Client Version</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test11" value="11">
+                    <label class="form-check-label" for="test11">11 - User-Agent Version</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test12" value="12">
+                    <label class="form-check-label" for="test12">12 - X-Forefront-Antispam-Report</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test13" value="13">
+                    <label class="form-check-label" for="test13">13 - X-MS-Exchange-Organization-SCL</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test14" value="14">
+                    <label class="form-check-label" for="test14">14 - X-Microsoft-Antispam-Mailbox-Delivery</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test15" value="15">
+                    <label class="form-check-label" for="test15">15 - X-Microsoft-Antispam Bulk Mail</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test16" value="16">
+                    <label class="form-check-label" for="test16">16 - X-Exchange-Antispam-Report-CFA-Test</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test17" value="17">
+                    <label class="form-check-label" for="test17">17 - Domain Impersonation</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test18" value="18">
+                    <label class="form-check-label" for="test18">18 - SpamAssassin Spam Status</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test19" value="19">
+                    <label class="form-check-label" for="test19">19 - SpamAssassin Spam Level</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test20" value="20">
+                    <label class="form-check-label" for="test20">20 - SpamAssassin Spam Flag</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test21" value="21">
+                    <label class="form-check-label" for="test21">21 - SpamAssassin Spam Report</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test22" value="22">
+                    <label class="form-check-label" for="test22">22 - OVH's X-VR-SPAMCAUSE</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test23" value="23">
+                    <label class="form-check-label" for="test23">23 - OVH's X-Ovh-Spam-Reason</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test24" value="24">
+                    <label class="form-check-label" for="test24">24 - OVH's X-Ovh-Spam-Score</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test25" value="25">
+                    <label class="form-check-label" for="test25">25 - X-Virus-Scan</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test26" value="26">
+                    <label class="form-check-label" for="test26">26 - X-Spam-Checker-Version</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test27" value="27">
+                    <label class="form-check-label" for="test27">27 - X-IronPort-AV</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test28" value="28">
+                    <label class="form-check-label" for="test28">28 - X-IronPort-Anti-Spam-Filtered</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test29" value="29">
+                    <label class="form-check-label" for="test29">29 - X-IronPort-Anti-Spam-Result</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test30" value="30">
+                    <label class="form-check-label" for="test30">30 - X-Mimecast-Spam-Score</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test31" value="31">
+                    <label class="form-check-label" for="test31">31 - Spam Diagnostics Metadata</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test32" value="32">
+                    <label class="form-check-label" for="test32">32 - MS Defender ATP Message Properties</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test33" value="33">
+                    <label class="form-check-label" for="test33">33 - Message Feedback Loop</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test34" value="34">
+                    <label class="form-check-label" for="test34">34 - End-to-End Latency - Message Delivery Time</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test36" value="36">
+                    <label class="form-check-label" for="test36">36 - X-IP-Spam-Verdict</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test37" value="37">
+                    <label class="form-check-label" for="test37">37 - X-Amp-Result</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test38" value="38">
+                    <label class="form-check-label" for="test38">38 - X-IronPort-RemoteIP</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test39" value="39">
+                    <label class="form-check-label" for="test39">39 - X-IronPort-Reputation</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test40" value="40">
+                    <label class="form-check-label" for="test40">40 - X-SBRS</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test41" value="41">
+                    <label class="form-check-label" for="test41">41 - X-IronPort-SenderGroup</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test42" value="42">
+                    <label class="form-check-label" for="test42">42 - X-Policy</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test43" value="43">
+                    <label class="form-check-label" for="test43">43 - X-IronPort-MailFlowPolicy</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test44" value="44">
+                    <label class="form-check-label" for="test44">44 - X-SEA-Spam</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test45" value="45">
+                    <label class="form-check-label" for="test45">45 - X-FireEye</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test46" value="46">
+                    <label class="form-check-label" for="test46">46 - X-AntiAbuse</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test47" value="47">
+                    <label class="form-check-label" for="test47">47 - X-TMASE-Version</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test48" value="48">
+                    <label class="form-check-label" for="test48">48 - X-TM-AS-Product-Ver</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test49" value="49">
+                    <label class="form-check-label" for="test49">49 - X-TM-AS-Result</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test50" value="50">
+                    <label class="form-check-label" for="test50">50 - X-IMSS-Scan-Details</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test51" value="51">
+                    <label class="form-check-label" for="test51">51 - X-TM-AS-User-Approved-Sender</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test52" value="52">
+                    <label class="form-check-label" for="test52">52 - X-TM-AS-User-Blocked-Sender</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test53" value="53">
+                    <label class="form-check-label" for="test53">53 - X-TMASE-Result</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test54" value="54">
+                    <label class="form-check-label" for="test54">54 - X-TMASE-SNAP-Result</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test55" value="55">
+                    <label class="form-check-label" for="test55">55 - X-IMSS-DKIM-White-List</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test56" value="56">
+                    <label class="form-check-label" for="test56">56 - X-TM-AS-Result-Xfilter</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test57" value="57">
+                    <label class="form-check-label" for="test57">57 - X-TM-AS-SMTP</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test58" value="58">
+                    <label class="form-check-label" for="test58">58 - X-TMASE-SNAP-Result</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test59" value="59">
+                    <label class="form-check-label" for="test59">59 - X-TM-Authentication-Results</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test60" value="60">
+                    <label class="form-check-label" for="test60">60 - X-Scanned-By</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test61" value="61">
+                    <label class="form-check-label" for="test61">61 - X-Mimecast-Spam-Signature</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test62" value="62">
+                    <label class="form-check-label" for="test62">62 - X-Mimecast-Bulk-Signature</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test63" value="63">
+                    <label class="form-check-label" for="test63">63 - X-Forefront-Antispam-Report-Untrusted</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test64" value="64">
+                    <label class="form-check-label" for="test64">64 - X-Microsoft-Antispam-Untrusted</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test65" value="65">
+                    <label class="form-check-label" for="test65">65 - X-Mimecast-Impersonation-Protect</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test66" value="66">
+                    <label class="form-check-label" for="test66">66 - X-Proofpoint-Spam-Details</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test67" value="67">
+                    <label class="form-check-label" for="test67">67 - X-Proofpoint-Virus-Version</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test68" value="68">
+                    <label class="form-check-label" for="test68">68 - SPFCheck</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test69" value="69">
+                    <label class="form-check-label" for="test69">69 - X-Barracuda-Spam-Score</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test70" value="70">
+                    <label class="form-check-label" for="test70">70 - X-Barracuda-Spam-Status</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test71" value="71">
+                    <label class="form-check-label" for="test71">71 - X-Barracuda-Spam-Report</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test72" value="72">
+                    <label class="form-check-label" for="test72">72 - X-Barracuda-Bayes</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test73" value="73">
+                    <label class="form-check-label" for="test73">73 - X-Barracuda-Start-Time</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test74" value="74">
+                    <label class="form-check-label" for="test74">74 - Similar to SpamAssassin Spam Level headers</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test75" value="75">
+                    <label class="form-check-label" for="test75">75 - SMTP Header Contained IP address</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test76" value="76">
+                    <label class="form-check-label" for="test76">76 - Other unrecognized Spam Related Headers</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test77" value="77">
+                    <label class="form-check-label" for="test77">77 - Other interesting headers</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test78" value="78">
+                    <label class="form-check-label" for="test78">78 - Security Appliances Spotted</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test79" value="79">
+                    <label class="form-check-label" for="test79">79 - Email Providers Infrastructure Clues</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test80" value="80">
+                    <label class="form-check-label" for="test80">80 - X-Microsoft-Antispam-Message-Info (use -a to show its results)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test81" value="81">
+                    <label class="form-check-label" for="test81">81 - Decoded Mail-encoded header values (use -a to show its results)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test82" value="82">
+                    <label class="form-check-label" for="test82">82 - Header Containing Client IP</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test83" value="83">
+                    <label class="form-check-label" for="test83">83 - Office365 Tenant ID</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test84" value="84">
+                    <label class="form-check-label" for="test84">84 - Organization Name</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test85" value="85">
+                    <label class="form-check-label" for="test85">85 - MS Defender for Office365 Safe Links Version</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test86" value="86">
+                    <label class="form-check-label" for="test86">86 - Suspicious Words in Headers</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test87" value="87">
+                    <label class="form-check-label" for="test87">87 - AWS SES Outgoing</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test88" value="88">
+                    <label class="form-check-label" for="test88">88 - IronPort-Data</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test89" value="89">
+                    <label class="form-check-label" for="test89">89 - IronPort-HdrOrder</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test90" value="90">
+                    <label class="form-check-label" for="test90">90 - X-DKIM</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test91" value="91">
+                    <label class="form-check-label" for="test91">91 - DKIM-Filter</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test92" value="92">
+                    <label class="form-check-label" for="test92">92 - X-SpamExperts-Class</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test93" value="93">
+                    <label class="form-check-label" for="test93">93 - X-SpamExperts-Evidence</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test94" value="94">
+                    <label class="form-check-label" for="test94">94 - X-Recommended-Action</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test95" value="95">
+                    <label class="form-check-label" for="test95">95 - X-AppInfo</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test96" value="96">
+                    <label class="form-check-label" for="test96">96 - X-Spam</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test97" value="97">
+                    <label class="form-check-label" for="test97">97 - X-TM-AS-MatchedID</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test98" value="98">
+                    <label class="form-check-label" for="test98">98 - MTA Hostname Exposed</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test99" value="99">
+                    <label class="form-check-label" for="test99">99 - Office365 First Contact Safety Tip</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test100" value="100">
+                    <label class="form-check-label" for="test100">100 - EOP - Bypass Focused Inbox</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test101" value="101">
+                    <label class="form-check-label" for="test101">101 - EOP - Enhanced Filtering - SkipListedInternetSender</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test102" value="102">
+                    <label class="form-check-label" for="test102">102 - EOP - Enhanced Filtering - ExternalOriginalInternetSender</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test103" value="103">
+                    <label class="form-check-label" for="test103">103 - Cloudmark Analysis</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test104" value="104">
+                    <label class="form-check-label" for="test104">104 - The Real Sender - via Authenticated-Sender</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test105" value="105">
+                    <label class="form-check-label" for="test105">105 - Identified Sender Addresses</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="test106" value="106">
+                    <label class="form-check-label" for="test106">106 - Unusual SMTP headers</label>
+                </div>
+
+            </div>
+        </div>
+
+
+            <button type="button" class="btn btn-primary btn-lg btn-block mt-3" onclick="decodeHeader()" style="background-color: rgb(204, 72, 72) !important;">Decode Header</button>
+        </form>
+
+        <div id="debugLog" class="mt-3"></div>
+        <div id="outputLink" class="mt-3" style="display: none;"></div>
+        <div id="outputLog" class="mt-3" style="display: none;"></div>
+    </div>
+
+    <script>
+        function browseFile() {
+            var fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.style.display = 'none'; 
+            fileInput.onchange = function(event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('headerText').value = event.target.result;
+                };
+                reader.readAsText(file);
+            };
+            document.body.appendChild(fileInput); 
+            fileInput.click();
+        }
+
+        function decodeHeader() {
+            var headerText = document.getElementById('headerText').value;
+            var outputFile = document.getElementById('outputFile').value;
+
+            var selectedTests = [];
+            for (var i = 1; i <= 106; i++) { 
+                if(document.getElementById('test' + i) && document.getElementById('test' + i).checked) {
+                    selectedTests.push(i);
+                }
+            }
+            
+            // COmmandsets:
+            // ------------
+            var command = `python3 ./run/decode-spam-headers.py header_in_tmp.txt -f html -o "${outputFile}"`;
+            var command2 = `python3 ./run/decode-spam-headers.py header_in_tmp.txt`;
+            if (selectedTests.length > 0) {
+                command += ` --include-tests ${selectedTests.join(',')}`;
+                command2 += ` --include-tests ${selectedTests.join(',')}`;
+            }
+
+
+            // AJAX request to execute the first shell command
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 0 || xhr.status === 200) {
+                        document.getElementById('debugLog').innerHTML = `<div class="alert alert-success success-bg" role="alert">decode-spam-headers script executed successfully.</div>`;
+                        document.getElementById('outputLink').innerHTML = `<br/><p><a class="btn btn-primary pastel-blue" href="${outputFile}" target="_blank">Open HTML results</a></p>`;
+                        document.getElementById('outputLink').style.display = 'block';
+                    } else {
+                        document.getElementById('debugLog').innerText = "Error executing the Python script. (Debug) => " + xhr.status;
+                    }
+                }
+            };
+            xhr.open("GET", `execute-command.php?command=${encodeURIComponent(command)}&headerText=${encodeURIComponent(headerText)}`, true);
+            xhr.send();
+
+            // Display the output of the second shell command
+            var outputLog = document.getElementById('outputLog');
+            outputLog.innerHTML = ''; 
+            outputLog.style.display = 'block'; // Display the output log
+
+            // AJAX request to execute the second shell command
+            var xhr2 = new XMLHttpRequest();
+            xhr2.onreadystatechange = function() {
+                if (xhr2.readyState === XMLHttpRequest.DONE) {
+                    if (xhr2.status === 0 || xhr2.status === 200) {
+                        var command2Output = xhr2.responseText;
+                        outputLog.innerHTML = `<button type="button" class="btn btn-info pastel-blue" data-toggle="collapse" data-target="#command2Output" aria-expanded="false" aria-controls="command2Output">View decode on page</button><br/><br/><div class="collapse" id="command2Output"><div class="alert alert-info" role="alert"><pre><code>${command2Output}</code></pre></div></div>`;
+                    } else {
+                        outputLog.innerText = "Error executing the Python script. (Debug) => " + xhr2.status;
+                    }
+                }
+            };
+            xhr2.open("GET", `execute-command.php?command=${encodeURIComponent(command2)}&headerText=${encodeURIComponent(headerText)}`, true);
+            xhr2.send();
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
